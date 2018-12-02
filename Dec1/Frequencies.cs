@@ -1,24 +1,16 @@
 using System;
-namespace Frequiencies {
-  class frequiencies {
+
+namespace AdventOfCode {
+  class SumFrequencies {
     static void Main() {
       //read from file
-      string[] input = System.IO.File.ReadAllLines(@"E:\Bibliotek\Prog\AdventOfCode\Dec1\Input.txt");
-      int[] inputInt = new int[input.Length];
-      int frequency = 0;
-      for(int i = 0; i < input.Length; i = i + 1) {
-      }
-
       //turn into int
-      for(int i = 0; i < input.Length; i = i + 1) {
-        inputInt[i] = Int32.Parse(input[i]);
-      }
+      int[] input = readFrequencyInput();
 
       //add all
-
       Console.WriteLine(frequency);
-      for(int i= 0; i < inputInt.Length; i = i +1) {
-        frequency = frequency + inputInt[i];
+      for(int i= 0; i < input.Length; i = i +1) {
+        frequency = frequency + input[i];
       }
 
       Console.WriteLine(frequency);
@@ -26,5 +18,15 @@ namespace Frequiencies {
       Console.WriteLine("Press key to continue");
       Console.ReadKey();
     }
+
+    static int[] readFrequencyInput() {
+      string[] input = System.IO.File.ReadAllLines(@"E:\Bibliotek\Prog\AdventOfCode\Dec1\Input.txt");
+      int[] inputInt = new int[input.Length];
+      for(int i = 0; i < input.Length; i = i + 1) {
+        inputInt[i] = Int32.Parse(input[i]);
+      }
+      return inputInt;
+    }
+
   }
 }
