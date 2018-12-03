@@ -18,7 +18,7 @@ namespace overlaps
             width = widthIn;
             height = heightIn;
         }
-        
+
     }
 
     class overlapping
@@ -33,17 +33,33 @@ namespace overlaps
         {
             foreach(string input in inputs)
             {
-                int space = findSpace(input, 1);
+                int start = 1;
+                int space = findSpace(input, start);
+                string coord;
                 int x;
                 int y;
                 int width;
                 int height;
                 int ID;
-                
+                int stop;
 
-                ID = Int32.Parse(input.Substring(1, (space - 1)));
+                ID = Int32.Parse(input.Substring(start, (space - 1)));
+                start = space + 3;
+                space = findSpace(input,start);
                 Console.WriteLine(ID);
+                coord = input.Substring(start,space-1);
+                for(int i = 0; i < coord.Length; i = i+1) {
+                  if(input[i].Equal(',')) {
+                    stop = i;
+                    break;
+                  }
+                }
+                x = Int32.Parse(coord.Substring(start,(stop-1)));
+                y = Int32.Parse(coord.Substring(stop+1,space-1));
 
+                Console.WriteLine(x);
+                Console.WriteLine(y);
+                // Make a general function "splitAt() that has indata what char you should split at instead of findSpace??"
             }
         }
 
