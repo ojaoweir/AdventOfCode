@@ -42,32 +42,46 @@ namespace overlaps
                 int height;
                 int ID;
                 int stop;
+                start = 1;
+                stop = findStop(input, start,' ');
+                ID = Int32.Parse(input.Substring(start,stop-1));
 
-                ID = Int32.Parse(input.Substring(start, (space - 1)));
-                start = space + 3;
-                space = findSpace(input,start);
-                Console.WriteLine(ID);
-                coord = input.Substring(start,space-1);
-                for(int i = 0; i < coord.Length; i = i+1) {
-                  if(input[i].Equal(',')) {
-                    stop = i;
-                    break;
-                  }
-                }
-                x = Int32.Parse(coord.Substring(start,(stop-1)));
-                y = Int32.Parse(coord.Substring(stop+1,space-1));
+                start = stop + 3;
+                stop = findStop(input, start,',');
+                x = Int32.Parse(input.Substring(start,stop-1));
 
-                Console.WriteLine(x);
-                Console.WriteLine(y);
+
+                start = stop + 1;
+                stop = findStop(input, start,':');
+                y = Int32.Parse(input.Substring(start,stop-1));
+
+                start = stop + 2;
+                stop = findStop(input, start,'x');
+                width = Int32.Parse(input.Substring(start,stop-1));
+
+                start = stop + 1;
+                stop = input.Length - 1;
+                height = Int32.Parse(input.Substring(start,stop-1));
+                Console.Write("#");
+                Console.Write(ID);
+                Console.Write(" ");
+                Console.Write(x);
+                Console.Write(",");
+                Console.Write(y);
+                Console.Write(" ");
+                Console.Write(width);
+                Console.Write("x");
+                Console.Write(height);
+                Console.WriteLine();
                 // Make a general function "splitAt() that has indata what char you should split at instead of findSpace??"
             }
         }
 
-        static int findSpace(string text, int start)
+        static int findStop(string text, int start,char match)
         {
             for (int i = start; i < input.Length; i = i + 1)
             {
-                if (input[i].Equals(' '))
+                if (input[i].Equals(match))
                 {
                     return i;
                 }
@@ -75,6 +89,5 @@ namespace overlaps
             return null;
 
         }
-
     }
 }
