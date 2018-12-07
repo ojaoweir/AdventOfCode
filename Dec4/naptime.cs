@@ -9,11 +9,14 @@ namespace naptime
         List<sleep> sleeps;
         public int ID;
         public int totalSleep;
+        public int[] sleepiestTime = new int[2];
         public guard(int IDin)
         {
             ID = IDin;
             sleeps = new List<sleep>();
             totalSleep = 0;
+            sleepiestTime[0] =0;
+            sleepiestTime[1] = 0;
         }
 
         public void calcTotalSleepTime()
@@ -21,7 +24,7 @@ namespace naptime
             totalSleep = 0;
             foreach(sleep s in sleeps)
             {
-                totalSleep = totalSleep + s.stop - s.start - 1;
+                totalSleep = totalSleep + s.minAsleep;
             }
         }
 
@@ -32,6 +35,25 @@ namespace naptime
             totalSleep = totalSleep + s.minAsleep;
             Console.WriteLine(ID);
             Console.WriteLine(s.minAsleep);
+        }
+
+        public void timeAsleepOnSleepiest()
+        {
+            sleepiestTime[0] = calcSleepiestTime();
+            sleepiestTime[1] = calcTimeAsleepOn(sleepiestTime[0]);
+        }
+
+        public int calcTimeAsleepOn(int time)
+        {
+            int times = 0;
+            foreach (sleep s in sleeps)
+            {
+                if (time >= s.start && time < s.stop)
+                {
+                    times++;
+                }
+            }
+            return times;
         }
 
         public int calcSleepiestTime()
@@ -80,7 +102,7 @@ namespace naptime
             stop = stopIn;
             Console.Write(stop);
             Console.Write(' ');
-            minAsleep = stop - start -1;
+            minAsleep = stop - start;
             Console.WriteLine(minAsleep);
         }
 
@@ -90,7 +112,8 @@ namespace naptime
     {
         static void Main()
         {
-            string[] inputs = System.IO.File.ReadAllLines(@"E:\Bibliotek\Prog\AdventOfCode\Dec4\input.txt");
+            string[] read = System.IO.File.ReadAllLines(@"E:\Bibliotek\Prog\AdventOfCode\Dec4\input.txt");
+            string[] inputs = doTheSort(read);
             int guardId = 0;
             bool asleep = false;
             List<guard> guards = new List<guard>();
@@ -101,16 +124,16 @@ namespace naptime
             foreach (string input in inputs)
             {
                 string date = input.Substring(1, 10);
-                if(!date.Equals(oldDate))
+                if (!date.Equals(oldDate))
                 {
-                    if(asleep)
+                    if (asleep)
                     {
                         sleeper.addSleep(new sleep(oldDate, startTime, 59)); //should be 60 instead?
                         asleep = false;
                     }
                     startTime = 0;
                     oldDate = date;
-                    
+
                 }
                 int stopPos;
                 switch (input[19])
@@ -131,18 +154,18 @@ namespace naptime
                         break;
                 }
             }
-            foreach(guard g in guards)
+            foreach (guard g in guards)
             {
                 g.calcTotalSleepTime();
             }
 
 
-            foreach(guard g in guards)
+            foreach (guard g in guards)
             {
                 Console.Write(g.totalSleep);
                 Console.Write(' ');
                 Console.WriteLine(sleeper.totalSleep);
-                if(g.totalSleep > sleeper.totalSleep)
+                if (g.totalSleep > sleeper.totalSleep)
                 {
                     sleeper = g;
 
@@ -153,8 +176,34 @@ namespace naptime
             int sleepmin = sleeper.calcSleepiestTime();
             Console.Write("Sleepiest minute: ");
             Console.WriteLine(sleepmin);
-            Console.Write("svar: ");
+            Console.Write("svar1: ");
             Console.Write(sleeper.ID * sleepmin);
+
+            foreach (guard g in guards)
+            {
+                g.timeAsleepOnSleepiest();
+            }
+
+
+            foreach (guard g in guards)
+            {
+                Console.Write(g.totalSleep);
+                Console.Write(' ');
+                Console.WriteLine(sleeper.totalSleep);
+                if (g.sleepiestTime[1] > sleeper.sleepiestTime[1])
+                {
+                    sleeper = g;
+
+                }
+            }
+            Console.Write("Guard: ");
+            Console.WriteLine(sleeper.ID);
+            Console.Write("most slept min: ");
+            Console.WriteLine(sleeper.sleepiestTime[0]);
+            Console.Write("svar2: ");
+            Console.Write(sleeper.ID * sleeper.sleepiestTime[0]);
+
+
         }
 
         static int getTime(string text)
@@ -187,6 +236,85 @@ namespace naptime
             }
             return 606060606;
 
+        }
+
+        static string[] doTheSort(string[] texts)
+        {
+            for(int i = 1; i < texts.Length; i++)
+            {
+                for(int j = i; j > 0; j--)
+                {
+                    if(!isFirst(texts[j],texts[j-1]))
+                    {
+                        break;
+                    } else
+                    {
+                        string temp = texts[j - 1];
+                        texts[j - 1] = texts[j];
+                        texts[j] = temp;
+                    }
+                }
+            }
+            return texts;
+        }
+
+        static bool isFirst(string s1, string s2)
+        {
+            //datum mindre
+            int valS1 = Int32.Parse(s1.Substring(1, 4));
+            int valS2 = Int32.Parse(s2.Substring(1, 4));          
+            if(valS1 == valS2)
+            {
+                valS1 = Int32.Parse(s1.Substring(6, 2));
+                valS2 = Int32.Parse(s2.Substring(6, 2));
+                if(valS1 == valS2)
+                {
+                    valS1 = Int32.Parse(s1.Substring(9, 2));
+                    valS2 = Int32.Parse(s2.Substring(9, 2));
+                    if(valS1 == valS2)
+                    {
+                        valS1 = Int32.Parse(s1.Substring(12, 2));
+                        valS2 = Int32.Parse(s2.Substring(12, 2));
+                        if (valS1 == valS2)
+                        {
+                            valS1 = Int32.Parse(s1.Substring(15, 2));
+                            valS2 = Int32.Parse(s2.Substring(15, 2));
+                            if (valS1 < valS2)
+                            {
+                                return true;
+                            }
+
+                        }
+                        else
+                        {
+                            if (valS1 > valS2)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(valS1 < valS2)
+                        {
+                            return true;
+                        }
+                    }
+
+                } else
+                {
+                    if (valS1 < valS2) {
+                        return true;
+                    }
+                }
+            } else
+            {
+                if(valS1 < valS2)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
