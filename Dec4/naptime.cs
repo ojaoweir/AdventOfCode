@@ -19,6 +19,25 @@ namespace naptime
             sleepiestTime[1] = 0;
         }
 
+        public int calcSleepMinute()
+        {
+            int[] min = new int[60];
+            for(int i = 0; i < min.Length; i++)
+            {
+                foreach(sleep s in sleeps)
+                {
+                    if(s.start <= i)
+                    {
+                        if(s.stop > i)
+                        {
+                            min[i]++;
+                        }
+                    }
+                }
+            }
+            return findMax(min);
+        }
+
         public void calcTotalSleepTime()
         {
             totalSleep = 0;
@@ -30,11 +49,8 @@ namespace naptime
 
         public void addSleep(sleep s)
         {
-            Console.WriteLine("Lägger till timmar: ");
             sleeps.Add(s);
             totalSleep = totalSleep + s.minAsleep;
-            Console.WriteLine(ID);
-            Console.WriteLine(s.minAsleep);
         }
 
         public void timeAsleepOnSleepiest()
@@ -48,8 +64,16 @@ namespace naptime
             int times = 0;
             foreach (sleep s in sleeps)
             {
+                Console.WriteLine();
+                Console.Write(time);
+                Console.Write(' ');
+                Console.Write(s.start);
+                Console.Write(' ');
+                Console.Write(s.stop);
+                Console.Write(' ');
                 if (time >= s.start && time < s.stop)
                 {
+                    Console.Write("true");
                     times++;
                 }
             }
@@ -96,14 +120,8 @@ namespace naptime
         {
             date = dateIn;
             start = startIn;
-            Console.WriteLine("start stop tot");
-            Console.Write(start);
-            Console.Write(' ');
             stop = stopIn;
-            Console.Write(stop);
-            Console.Write(' ');
             minAsleep = stop - start;
-            Console.WriteLine(minAsleep);
         }
 
     }
@@ -128,7 +146,7 @@ namespace naptime
                 {
                     if (asleep)
                     {
-                        sleeper.addSleep(new sleep(oldDate, startTime, 59)); //should be 60 instead?
+                        sleeper.addSleep(new sleep(oldDate, startTime, 59));
                         asleep = false;
                     }
                     startTime = 0;
@@ -162,9 +180,6 @@ namespace naptime
 
             foreach (guard g in guards)
             {
-                Console.Write(g.totalSleep);
-                Console.Write(' ');
-                Console.WriteLine(sleeper.totalSleep);
                 if (g.totalSleep > sleeper.totalSleep)
                 {
                     sleeper = g;
@@ -177,9 +192,10 @@ namespace naptime
             Console.Write("Sleepiest minute: ");
             Console.WriteLine(sleepmin);
             Console.Write("svar1: ");
-            Console.Write(sleeper.ID * sleepmin);
+            Console.WriteLine(sleeper.ID * sleepmin);
+            Console.WriteLine();
 
-            foreach (guard g in guards)
+            /*foreach (guard g in guards)
             {
                 g.timeAsleepOnSleepiest();
             }
@@ -187,15 +203,14 @@ namespace naptime
 
             foreach (guard g in guards)
             {
-                Console.Write(g.totalSleep);
-                Console.Write(' ');
-                Console.WriteLine(sleeper.totalSleep);
-                if (g.sleepiestTime[1] > sleeper.sleepiestTime[1])
+                if (g.sleepiestTime[0] > sleeper.sleepiestTime[0])
                 {
                     sleeper = g;
 
                 }
             }
+            Console.WriteLine();
+            Console.WriteLine();
             Console.Write("Guard: ");
             Console.WriteLine(sleeper.ID);
             Console.Write("most slept min: ");
@@ -203,7 +218,37 @@ namespace naptime
             Console.Write("svar2: ");
             Console.Write(sleeper.ID * sleeper.sleepiestTime[0]);
 
+            */
 
+            doTaskB(guards);
+        }
+        //Of all guards, which guard is most frequently asleep on the same minute?
+        static void doTaskB(List<guard> guardsList)
+        {
+            int[] min = new int[guardsList.Count];
+            guard[] guards = guardsList.ToArray();
+            for(int i = 0; i < min.Length; i++)
+            {
+                min[i] = guards[i].calcSleepMinute();
+            }
+            int index = 0;
+            for(int i = 0; i < min.Length; i++)
+            {
+                if(min[i] > min[index])
+                {
+                    index = i;
+                }
+
+            }
+
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.Write("Guard: ");
+            Console.WriteLine(guards[index].ID);
+            Console.Write("most slept min: ");
+            Console.WriteLine(min[index]);
+            Console.Write("svar2: ");
+            Console.Write(guards[index].ID * min[index]);
         }
 
         static int getTime(string text)
