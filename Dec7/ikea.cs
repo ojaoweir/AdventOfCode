@@ -9,10 +9,12 @@ namespace dec7
         List<step> succ;
         char c;
         bool pushed;
+        int time;
         public step(char cIn)
         {
             pred = new List<step>();
             c = cIn;
+            time = (int)c - 64;
             succ = new List<step>();
             pushed = false;
         }
@@ -67,6 +69,18 @@ namespace dec7
         {
             return left.getC().CompareTo(right.getC());
         }
+
+        public bool predDone()
+        {
+            foreach(step s in pred)
+            {
+                if(!s.getPushed())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
     class ikea
     {
@@ -79,9 +93,10 @@ namespace dec7
             //en referens start
             //sista blir null
             //sortera enligt input glöm inte att de ska vara i alfabetsordning!
-            step root = makeTree(input);
+            step[] steps = makeArr(input);
+            step root = makeTree(input,steps);
             //Denna nedan som inte funkar som den ska
-            printOrder(root);
+            Stack<step> order = printOrderNew(root,steps);
         }
 
         static void printPred(step root)
@@ -97,6 +112,84 @@ namespace dec7
             {
                 printPred(s);
             }
+        }
+
+        static Stack<step> printOrderNew(step root, step[] steps)
+        {
+            steps = sortArr(steps);
+            Stack<step> order = new Stack<step>();
+            Stack<step> orderRev = new Stack<step>();
+            order.Push(root);
+            root.push();
+            
+            while(notEmpty(steps))
+            {
+                step temp = getNext(steps);
+                order.Push(temp);
+                temp.push();
+            }
+            while(order.Count != 0)
+            {
+                orderRev.Push(order.Pop());
+            }
+            return orderRev;
+        }
+
+        static step getNext(step[] steps)
+        {
+            foreach(step s in steps)
+            {
+                if(!s.getPushed())
+                {
+                    if(s.predDone())
+                    {
+                        return s;
+                    }
+                }
+            }
+            return steps[0];
+        }
+        
+        static bool notEmpty(step[] steps)
+        {
+            foreach(step s in steps)
+            {
+                if(!s.getPushed())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        static step[] sortArr(step[] steps)
+        {
+            int lowest;
+            for(int i = 0; i < steps.Length; i++)
+            {
+                lowest = findLowestIndex(steps, i);
+                if(steps[i].getC() > steps[lowest].getC())
+                {
+                    step temp = steps[i];
+                    steps[i] = steps[lowest];
+                    steps[lowest] = temp;
+                }
+            }
+            return steps;
+        }
+
+        static int findLowestIndex(step[] steps, int start)
+        {
+            int index = steps.Length - 1;
+            for(int i = steps.Length -1; i > start; i --)
+            {
+                if(steps[i].getC() < steps[index].getC())
+                {
+                    index = i;
+                }
+
+            }
+            return index;
         }
 
         static void printOrder(step root)
@@ -153,12 +246,24 @@ namespace dec7
             }
         }
 
-        static step makeTree(char [,] input)
+        static step makeTree(char [,] input, step[] allSteps)
+        {
+            step root = sortSteps(allSteps, input);
+            return root;
+        }
+
+        static step[] makeArr(char[,] input)
         {
             List<char> allStepChars = addAllStepChars(input);
             step[] allSteps = addAllSteps(allStepChars);
-            step root = sortSteps(allSteps, input);
-            return root;
+            return allSteps;
+        }
+
+        static step[] makeArray(char[,] input)
+        {
+            List<char> allStepChars = addAllStepChars(input);
+            step[] allSteps = addAllSteps(allStepChars);
+            return allSteps;
         }
 
         static step sortSteps(step[] steps, char[,] input)
@@ -176,17 +281,17 @@ namespace dec7
 
             foreach(step s in steps)
             {
-                s.sortPred();
+                s.sortSucc();
             }
-            root = findLastStep(steps);
+            root = findFirstStep(steps);
             return root;
         }
 
-        static step findLastStep(step[] steps)
+        static step findFirstStep(step[] steps)
         {
             foreach(step s in steps)
             {
-                if(s.getSucc().Count == 0)
+                if(s.getPred().Count == 0)
                 {
                     return s;
                 }
