@@ -56,7 +56,7 @@ namespace dec7
         {
             pred = new List<step>();
             c = cIn;
-            time = (int)c - 64; //+60
+            time = (int)c - 64 + 60;
             succ = new List<step>();
             pushed = false;
         }
@@ -149,44 +149,44 @@ namespace dec7
             //sista blir null
             //sortera enligt input glöm inte att de ska vara i alfabetsordning!
             step[] steps = makeArr(input);
-            step root = makeTree(input,steps);
+            step root = makeTree(input, steps);
             //!!!!! det chillar en sekund även fast det finns jobbb, fix
             //Stack<step> order = printOrderNew(root,steps);  -- uppgiftA
             Console.WriteLine("S \t W1 \t W2 \t W3 \t W4 \t W5 \t Done");
             int counter = 0;
-            worker[] wArr = new worker[2]; //5
-            for(int i = 0; i<wArr.Length; i++)
+            worker[] wArr = new worker[5]; //5
+            for (int i = 0; i < wArr.Length; i++)
             {
                 wArr[i] = new worker();
             }
-            while(notDone(steps))
+            while (notDone(steps))
             {
-                foreach(worker w in wArr)
+                foreach (worker w in wArr)
                 {
-                    if(!w.haveWork())
-                    {
-                        if(isReadyStep(steps))
-                        {
-                            w.setStep(findReadyStep(steps));
-                        }
-                    } else
+                    if (w.haveWork())
                     {
                         w.work();
                     }
+                    if (!w.haveWork())
+                    {
+                        if (isReadyStep(steps))
+                        {
+                            w.setStep(findReadyStep(steps));
+                        }
+                    }
                 }
-                Console.Write(counter + "\t" + wArr[0].getWork().getC() + "\t" + wArr[1].getWork().getC() + "\t");// + "\t" + wArr[2].getWork().getC() + "\t" + wArr[3].getWork().getC() + "\t" + wArr[4].getWork().getC() + "\t");
-                foreach(step s in steps)
+                Console.Write(counter + "\t" + wArr[0].getWork().getC() + "\t" + wArr[1].getWork().getC() + "\t" + wArr[2].getWork().getC() + "\t" + wArr[3].getWork().getC() + "\t" + wArr[4].getWork().getC() + "\t");
+                foreach (step s in steps)
                 {
-                    if(s.getPushed())
+                    if (s.getPushed())
                     {
                         Console.Write(s.getC());
                     }
                 }
                 Console.WriteLine();
                 counter++;
-            }
+                }
         }
-
         static step findReadyStep(step[] steps)
         {
             foreach (step s in steps)
