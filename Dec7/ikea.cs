@@ -3,6 +3,47 @@ using System.Collections.Generic;
 
 namespace dec7
 {
+    class worker
+    {
+        int time = 0;
+        static step idle = new step('.');
+        step working = idle;
+        bool isWorking = false;
+
+        public bool haveWork()
+        {
+            return isWorking;
+        }
+
+        public void setStep(step inStep)
+        {
+            working = inStep;
+            isWorking = true;
+            working.setWorked();
+        }
+
+        public step getWork()
+        {
+            return working;
+        }
+
+        public void work()
+        {
+            time++;
+            if(time == working.getTime())
+            {
+                finishWork();
+            }
+        }
+         private void finishWork()
+        {
+            working.push();
+            time = 0;
+            isWorking = false;
+            working = idle;
+
+        }
+    }
     class step
     {
         List<step> pred;
@@ -10,15 +51,29 @@ namespace dec7
         char c;
         bool pushed;
         int time;
+        bool worked = false;
         public step(char cIn)
         {
             pred = new List<step>();
             c = cIn;
-            time = (int)c - 64;
+            time = (int)c - 64; //+60
             succ = new List<step>();
             pushed = false;
         }
 
+        public void setWorked()
+        {
+            worked = true;
+        }
+
+        public bool getWorked()
+        {
+            return worked;
+        }
+        public int getTime()
+        {
+            return time;
+        }
         public void push()
         {
             pushed = true;
@@ -95,8 +150,78 @@ namespace dec7
             //sortera enligt input glöm inte att de ska vara i alfabetsordning!
             step[] steps = makeArr(input);
             step root = makeTree(input,steps);
-            //Denna nedan som inte funkar som den ska
-            Stack<step> order = printOrderNew(root,steps);
+            //!!!!! det chillar en sekund även fast det finns jobbb, fix
+            //Stack<step> order = printOrderNew(root,steps);  -- uppgiftA
+            Console.WriteLine("S \t W1 \t W2 \t W3 \t W4 \t W5 \t Done");
+            int counter = 0;
+            worker[] wArr = new worker[2]; //5
+            for(int i = 0; i<wArr.Length; i++)
+            {
+                wArr[i] = new worker();
+            }
+            while(notDone(steps))
+            {
+                foreach(worker w in wArr)
+                {
+                    if(!w.haveWork())
+                    {
+                        if(isReadyStep(steps))
+                        {
+                            w.setStep(findReadyStep(steps));
+                        }
+                    } else
+                    {
+                        w.work();
+                    }
+                }
+                Console.Write(counter + "\t" + wArr[0].getWork().getC() + "\t" + wArr[1].getWork().getC() + "\t");// + "\t" + wArr[2].getWork().getC() + "\t" + wArr[3].getWork().getC() + "\t" + wArr[4].getWork().getC() + "\t");
+                foreach(step s in steps)
+                {
+                    if(s.getPushed())
+                    {
+                        Console.Write(s.getC());
+                    }
+                }
+                Console.WriteLine();
+                counter++;
+            }
+        }
+
+        static step findReadyStep(step[] steps)
+        {
+            foreach (step s in steps)
+            {
+                if (!s.getWorked() && s.predDone())
+                {
+                    return s;
+                }
+            }
+            return new step('3');
+
+        }
+
+        static bool isReadyStep(step[] steps)
+        {
+            foreach(step s in steps)
+            {
+                if(!s.getWorked() && s.predDone())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        static bool notDone(step[] steps)
+        {
+            foreach(step s in steps)
+            {
+                if(!s.getPushed())
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         static void printPred(step root)
