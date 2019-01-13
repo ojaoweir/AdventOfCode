@@ -21,17 +21,44 @@ namespace dec8
             addMetadata();
         }
 
-        public int calcSum()
+        public int calcValue()
+        {
+            int value = 0;
+            if(nrChildren == 0)
+            {
+                value = sumMetadata();
+            } else
+            {
+                foreach(int m in metadata)
+                {
+                    if(m != 0 && m-1 < children.Length)
+                    {
+                        value += children[m - 1].calcValue();
+                    }
+                }
+            }
+            return value;
+        }
+
+        int sumMetadata()
+        {
+            int sum = 0;
+            foreach (int m in metadata)
+            {
+                sum += m;
+            }
+            return sum;
+
+        }
+
+        public int calcTreeSum()
         {
             int sum = 0;
             foreach(node n in children)
             {
-                sum += n.calcSum();
+                sum += n.calcTreeSum();
             }
-            foreach(int m in metadata)
-            {
-                sum += m;
-            }
+            sum += sumMetadata();
             return sum;
         }
 
@@ -91,8 +118,13 @@ namespace dec8
         {
             node.setInput(System.IO.File.ReadAllText(@"E:\Bibliotek\Prog\AdventOfCode\Dec8\input.txt"));
             node root = makeTree();
-            int answer1 = root.calcSum();
-            Console.Write(answer1);
+            int answer1 = root.calcTreeSum();
+            Console.Write("Svar1: ");
+            Console.WriteLine(answer1);
+            int answer2 = root.calcValue();
+            Console.Write("Svar2: ");
+            Console.WriteLine(answer2);
+
         }
 
         static node makeTree()
