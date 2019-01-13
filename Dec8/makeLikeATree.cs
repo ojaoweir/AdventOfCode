@@ -8,6 +8,7 @@ namespace dec8
         static int counter = 5; //input börjar på tecken 5 efter att vi fått roots värden
         int nrChildren;
         int nrMetadata;
+        static int end;
         node[] children;
         int[] metadata;
         public node(int nrChildrenIn, int nrMetadataIn)
@@ -20,18 +21,49 @@ namespace dec8
             addMetadata();
         }
 
+        public int calcSum()
+        {
+            int sum = 0;
+            foreach(node n in children)
+            {
+                sum += n.calcSum();
+            }
+            foreach(int m in metadata)
+            {
+                sum += m;
+            }
+            return sum;
+        }
+
         void addChildren()
         {
             int h1;
             int h2;
+            int end;
             for (int i = 0; i < children.Length; i++)
             {
-                h1 = 0;
-                h2 = 0;
+                end = findSpace(counter);
+                h1 = Int32.Parse(input.Substring(counter,end -counter));
+                counter = end+1;
+                end = findSpace(counter);
+                h2 = Int32.Parse(input.Substring(counter, end-counter));
+                counter = end+1;
                 //läs h1 och h2 från input med counter
                 children[i] = new node(h1, h2);
             }
 
+        }
+
+        int findSpace(int counter)
+        {
+            for(int i = counter + 1; i < input.Length; i++)
+            {
+                if(input[i].Equals(' '))
+                {
+                    return i;
+                }
+            }
+            return input.Length -1;
         }
 
         void addMetadata()
@@ -39,7 +71,9 @@ namespace dec8
             int m;
             for (int i = 0; i < metadata.Length; i++)
             {
-                //läs m från input med counter
+                end = findSpace(counter);
+                m = Int32.Parse(input.Substring(counter, end - counter));
+                counter = end + 1;
                 metadata[i] = m;
             }
 
@@ -57,6 +91,8 @@ namespace dec8
         {
             node.setInput(System.IO.File.ReadAllText(@"E:\Bibliotek\Prog\AdventOfCode\Dec8\input.txt"));
             node root = makeTree();
+            int answer1 = root.calcSum();
+            Console.Write(answer1);
         }
 
         static node makeTree()
