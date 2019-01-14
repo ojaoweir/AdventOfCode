@@ -12,6 +12,26 @@ namespace marbles
         {
         }
 
+        public void write(int current)
+        {
+            if(value != current)
+            {
+                Console.Write(value);
+                Console.Write(" ");
+            } else
+            {
+                Console.Write("(");
+                Console.Write(value);
+                Console.Write(")");
+                Console.Write(" ");
+
+            }
+            if(clockwise.getValue() != 0)
+            {
+                clockwise.write(current);
+            }
+        }
+
         public void initiate(marble clockwiseIn, marble counterClockwiseIn, int valueIn)
         {
             setClockwise(clockwiseIn);
@@ -52,13 +72,15 @@ namespace marbles
             return newMarble;
         }
 
-        public int remove(int time)
+        public marble remove(int time)
         {
+            //Console.WriteLine();
+           // Console.Write(value);
             if (time == 0)
             {
                 clockwise.setCounterClockwise(counterClockwise);
                 counterClockwise.setClockwise(clockwise);
-                return value;
+                return this;
             }
             else
             {
@@ -71,31 +93,37 @@ namespace marbles
     {
         public static void Main()
         {
-            int maxValue = 1618;
-            int nrPlayers = 10;
-            int[] players = new int[nrPlayers];
+            int maxValue = 7184300;
+            int nrPlayers = 468;
+            long[] players = new long[nrPlayers];
             int playercounter = 0;
             marble current = new marble();
+            marble zero = current;
             current.initiate(current, current, 0);
+            current.getClockwise().setCounterClockwise(current);
             for(int i = 1; i <= maxValue; i++)
             {
                 if(i % 23 != 0)
                 {
                     current = current.addNewAsCurrent(i);
+                    current.getClockwise().setCounterClockwise(current);
                 } else
                 {
                     players[playercounter] += i; //lägg till score till player
-                    players[playercounter] += current.remove(7);
+                    current = current.remove(7);
+                    players[playercounter] += current.getValue();
+                    current = current.getClockwise();
                 }
                 playercounter = (playercounter +1) % nrPlayers;
-                Console.WriteLine(playercounter);
+                //zero.write(current.getValue());
+                //Console.WriteLine();
             }
-            int answer1 = players[findMaxPlayer(players)];
+            long answer1 = players[findMaxPlayer(players)];
             Console.Write("Svar1: ");
             Console.WriteLine(answer1);
         }
 
-        static int findMaxPlayer(int[] players)
+        static int findMaxPlayer(long[] players)
         {
             int leader = 0;
             for(int i = 0; i < players.Length; i++)
