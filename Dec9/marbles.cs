@@ -48,8 +48,22 @@ namespace marbles
         {
             marble newMarble = new marble();
             newMarble.initiate(clockwise.getClockwise(), clockwise, valueIn);
-            clockwise.setClockwise() = newMarble;
+            clockwise.setClockwise(newMarble);
             return newMarble;
+        }
+
+        public int remove(int time)
+        {
+            if (time == 0)
+            {
+                clockwise.setCounterClockwise(counterClockwise);
+                counterClockwise.setClockwise(clockwise);
+                return value;
+            }
+            else
+            {
+                return counterClockwise.remove(time - 1);
+            }
         }
     }
 
@@ -57,9 +71,9 @@ namespace marbles
     {
         public static void Main()
         {
-            int maxValue = 71843;
-            int nrPlayers = 468;
-            int players = new int[nrPlayers];
+            int maxValue = 1618;
+            int nrPlayers = 10;
+            int[] players = new int[nrPlayers];
             int playercounter = 0;
             marble current = new marble();
             current.initiate(current, current, 0);
@@ -70,9 +84,28 @@ namespace marbles
                     current = current.addNewAsCurrent(i);
                 } else
                 {
-                    //lägg till score till player
+                    players[playercounter] += i; //lägg till score till player
+                    players[playercounter] += current.remove(7);
+                }
+                playercounter = (playercounter +1) % nrPlayers;
+                Console.WriteLine(playercounter);
+            }
+            int answer1 = players[findMaxPlayer(players)];
+            Console.Write("Svar1: ");
+            Console.WriteLine(answer1);
+        }
+
+        static int findMaxPlayer(int[] players)
+        {
+            int leader = 0;
+            for(int i = 0; i < players.Length; i++)
+            {
+                if(players[i] > players[leader])
+                {
+                    leader = i;
                 }
             }
+            return leader;
         }
     }
 }
